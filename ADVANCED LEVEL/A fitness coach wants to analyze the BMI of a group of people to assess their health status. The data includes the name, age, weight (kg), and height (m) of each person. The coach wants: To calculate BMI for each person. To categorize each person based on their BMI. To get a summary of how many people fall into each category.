@@ -1,0 +1,44 @@
+# Function to calculate BMI
+def calculate_bmi(weight, height):
+    return weight / (height ** 2)
+
+# Function to categorize BMI
+def bmi_category(bmi):
+    if bmi < 18.5:
+        return "Underweight"
+    elif 18.5 <= bmi < 24.9:
+        return "Normal"
+    elif 25 <= bmi < 29.9:
+        return "Overweight"
+    else:
+        return "Obese"
+
+# List of people: (name, age, weight, height)
+people = [
+    ("Amit", 25, 70, 1.75),
+    ("Neha", 22, 52, 1.60),
+    ("Rahul", 30, 90, 1.78),
+    ("Priya", 28, 45, 1.55),
+    ("Karan", 35, 110, 1.82)
+]
+
+summary = {"Underweight": 0, "Normal": 0, "Overweight": 0, "Obese": 0}
+
+print("---- BMI Report ----\n")
+
+for person in people:
+    name, age, weight, height = person
+    bmi = calculate_bmi(weight, height)
+    category = bmi_category(bmi)
+
+    summary[category] += 1
+
+    print(f"Name: {name}")
+    print(f"Age: {age}")
+    print(f"Weight: {weight} kg, Height: {height} m")
+    print(f"BMI: {bmi:.2f}")
+    print(f"Category: {category}\n")
+
+print("---- Summary ----")
+for cat, count in summary.items():
+    print(f"{cat}: {count} people")
