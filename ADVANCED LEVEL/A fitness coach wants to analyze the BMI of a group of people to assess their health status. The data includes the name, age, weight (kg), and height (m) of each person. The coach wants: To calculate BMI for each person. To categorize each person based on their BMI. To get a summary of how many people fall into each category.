@@ -15,11 +15,11 @@ def bmi_category(bmi):
 
 # List of people: (name, age, weight, height)
 people = [
-    ("Amit", 25, 70, 1.75),
+    ("bhummi", 25, 70, 1.75),
     ("Neha", 22, 52, 1.60),
-    ("Rahul", 30, 90, 1.78),
+    ("Mr. tinku ", 30, 90, 1.78),
     ("Priya", 28, 45, 1.55),
-    ("Karan", 35, 110, 1.82)
+    ("vickey gujjar", 35, 110, 1.82)
 ]
 
 summary = {"Underweight": 0, "Normal": 0, "Overweight": 0, "Obese": 0}
