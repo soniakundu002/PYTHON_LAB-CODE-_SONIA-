@@ -1,0 +1,153 @@
+"""
+Numerology Name Number Tool
+- Uses the Pythagorean mapping:
+  A J S = 1, B K T = 2, C L U = 3, D M V = 4, E N W = 5,
+  F O X = 6, G P Y = 7, H Q Z = 8, I R = 9
+- Reduces sums to a single digit unless result is master number (11 or 22)
+- Processes multiple names and prints a report (can save to CSV)
+"""
+
+import csv
+
+LETTER_VALUES = {
+    **dict.fromkeys(list("AJSajs"), 1),
+    **dict.fromkeys(list("BKTbkt"), 2),
+    **dict.fromkeys(list("CLUclu"), 3),
+    **dict.fromkeys(list("DMVdmv"), 4),
+    **dict.fromkeys(list("ENWenw"), 5),
+    **dict.fromkeys(list("FOXfox"), 6),
+    **dict.fromkeys(list("GPYgpy"), 7),
+    **dict.fromkeys(list("HQZhqz"), 8),
+    **dict.fromkeys(list("IRir"), 9),
+}
+
+PERSONALITY_MEANINGS = {
+    1: "Leader, independent, ambitious, pioneering.",
+    2: "Diplomatic, cooperative, sensitive, peacemaker.",
+    3: "Creative, expressive, social, optimistic.",
+    4: "Practical, hardworking, stable, detail-oriented.",
+    5: "Adventurous, freedom-loving, adaptable, energetic.",
+    6: "Nurturing, responsible, family-oriented, harmonious.",
+    7: "Analytical, introspective, spiritual, seeker.",
+    8: "Powerful, material success, authoritative, managerial.",
+    9: "Compassionate, humanitarian, generous, idealistic.",
+    11: "Master intuitive/visionary — inspires others, spiritual insight.",
+    22: "Master builder — powerful at turning ideas into reality."
+}
+
+MASTER_NUMBERS = {11, 22}
+
+
+def name_to_value(name: str) -> int:
+    """Compute the total numeric value of letters in the name (ignores non-letters)."""
+    total = 0
+    for ch in name:
+        if ch.isalpha():
+            total += LETTER_VALUES.get(ch, 0)
+    return total
+
+
+def reduce_number(n: int) -> int:
+    """Reduce number to a single digit unless it's a master number (11 or 22)."""
+    while True:
+        if n in MASTER_NUMBERS:
+            return n
+        if n < 10:
+            return n
+      
+        s = 0
+        for d in str(n):
+            s += int(d)
+        n = s
+
+
+def numerology_for_name(name: str):
+    """Return (raw_sum, reduced_value, meaning)."""
+    raw = name_to_value(name)
+    reduced = reduce_number(raw)
+    meaning = PERSONALITY_MEANINGS.get(reduced, "No meaning available.")
+    return raw, reduced, meaning
+
+
+def process_names(names):
+    """Process list of names and return results list of dicts."""
+    results = []
+    for nm in names:
+        nm_stripped = nm.strip()
+        if not nm_stripped:
+            continue
+        raw, reduced, meaning = numerology_for_name(nm_stripped)
+        results.append({
+            "name": nm_stripped,
+            "raw_sum": raw,
+            "numerology_number": reduced,
+            "meaning": meaning
+        })
+    return results
+
+
+def print_report(results):
+    print("\nNumerology Report")
+    print("-" * 60)
+    print(f"{'Name':25s} | {'Raw Sum':7s} | {'Number':6s} | Meaning")
+    print("-" * 60)
+    for r in results:
+        print(f"{r['name'][:25]:25s} | {r['raw_sum']:7d} | {str(r['numerology_number']):6s} | {r['meaning']}")
+    print("-" * 60)
+
+    summary = {}
+    for r in results:
+        summary[r['numerology_number']] = summary.get(r['numerology_number'], 0) + 1
+    print("\nSummary (count per number):")
+    for num in sorted(summary.keys()):
+        print(f"  {num}: {summary[num]} person(s)")
+
+
+def save_to_csv(results, filename):
+    with open(filename, "w", newline='', encoding='utf-8') as csvfile:
+        fieldnames = ["name", "raw_sum", "numerology_number", "meaning"]
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+        for r in results:
+            writer.writerow(r)
+    print(f"Saved report to '{filename}'")
+
+
+def main():
+    print("Numerology Name Number Tool")
+    print("Enter names separated by commas, or enter one per line.")
+    raw_input_str = input("Enter names (comma-separated or single name): ").strip()
+    names = []
+
+    if "," in raw_input_str:
+        names = [s.strip() for s in raw_input_str.split(",") if s.strip()]
+    elif raw_input_str:
+        names = [raw_input_str]
+  
+        print("Enter more names one-per-line. Submit an empty line to finish.")
+        while True:
+            line = input().strip()
+            if not line:
+                break
+            names.append(line)
+    else:
+        print("No names entered. Exiting.")
+        return
+
+    results = process_names(names)
+    if not results:
+        print("No valid names to process.")
+        return
+
+    print_report(results)
+
+    save = input("\nWould you like to save the report to CSV? (y/n): ").strip().lower()
+    if save == 'y':
+        fname = input("Enter filename (e.g. report.csv): ").strip()
+        if not fname:
+            fname = "numerology_report.csv"
+        save_to_csv(results, fname)
+
+
+if __name__ == "__main__":
+    main()
